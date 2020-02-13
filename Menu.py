@@ -3,6 +3,10 @@ from Vehiculo import Vehiculo
 from Archivo import Archivo
 from MongoDB import Mongo
 from pymongo import MongoClient
+from MySQL import MySQL
+from SQLite import SQLite
+from Empleado import Empleado
+
 
 class Menu():
     def __init__(self):
@@ -22,7 +26,6 @@ class Menu():
         self.__db.insertarEmpleado(self.__venta.getEmpleado())
         self.nuevoVehiculo()
 
-    
     def qNuevoEmpleado(self):
         respuesta = self.pEmpleado()
         while not respuesta == 'n':
@@ -40,8 +43,15 @@ class Menu():
             # Insertar Auto a la base de datos (recive al objeto auto , bono del empleado, comisiones empleado)
             self.__db.insertarAuto(v , self.__venta.getEmpleado().getBono(), self.__venta.getEmpleado().getComisiones())
             respuesta = self.pVenta()
-        self.__venta.guardarEmpleado()
         self.imprimirEmpleado()
+
+    def agregarVehiculo(self):
+        c = int(self.__db.consultarEmpleados())
+        op = int(input("Selecciona un empleado: "))
+
+        for i in range(c):
+            if op == (i+1):
+                self.__db.editar(op)
 
     def imprimirVehiculos(self):
         for vehiculo in self.__venta.getEmpleado().getvVendidos():
@@ -49,7 +59,7 @@ class Menu():
 
     def imprimirEmpleado(self):
         print('---------------------')
-        print("Nombre: " + self.__venta.getEmpleado().getNombre() + " Salario: " + str(self.__venta.getEmpleado().getSalario()) + " Comision: " + str(self.__venta.getEmpleado().getComisiones()))
+        print("Nombre: " + self.__venta.getEmpleado().getNombre() + " Salario: " + str(self.__venta.getEmpleado().getSalario()) + " Comisiones: " + str(self.__venta.getEmpleado().getComisiones()) + " Bono: " + str(self.__venta.getEmpleado().getBono()))
         print('---------------------')
 
     def imprimirEmpleados(self):
@@ -62,6 +72,7 @@ class Menu():
     def imprimirNomina(self):
         print('---------------------')
         print('Nomina: ${0}'.format(self.__venta.getNomina()))
+        self.__db.cerrarConexion()
 
     def cargarArchivo(self):
         respuesta = input('¿Deseas cargar el archivo? (s/n): ')
@@ -76,10 +87,28 @@ class Menu():
             archivo.guardarLista(empleados)
             self.imprimirEmpleados()
 
-
     def run(self):
         # self.cargarArchivo()
-        self.qNuevoEmpleado()
-        self.imprimirEmpleados()
-        self.imprimirNomina()
+        self.menu()
+        op = input("Desea realizar otre accion(s/n): ")
+        while op == "s":
+            self.menu()
+            op = str(input("Desea realizar otre accion(s/n): "))
+            if op == "n":
+                break
         # self.guardarArchivo(self.__venta.getEmpleados())
+
+    def menu(self):
+        print("1)Agregar empleado")
+        print("2)Mostrar empleados")
+        print("3)Editar empleados")
+        print("4)Imprimir nomina")
+        op = int(input("Selecciona una opcion: "))
+        if op == 1:
+            self.qNuevoEmpleado()
+        elif op == 2:
+            self.__db.consultarEmpleados()
+        elif op == 3:
+            self.agregarVehiculo()
+        elif op == 4:
+            self.imprimirNomina()

@@ -1,5 +1,6 @@
 import pickle
 
+
 class Archivo():
     def __init__(self):
         self.__empleados = []
@@ -22,5 +23,3 @@ class Archivo():
             return self.__empleados
         except:
             print("No existe el archivo")
-    
-    
